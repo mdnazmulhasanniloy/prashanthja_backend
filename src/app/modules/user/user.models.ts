@@ -149,6 +149,7 @@ const userSchema: Schema<IUser> = new Schema(
 );
 
 userSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+userSchema.index({ location: '2dsphere' });  
 userSchema.index({
   name: 'text',
   email: 'text',

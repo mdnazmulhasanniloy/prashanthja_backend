@@ -1,0 +1,1160 @@
+{
+  "info": {
+    "name": "Prashanthja Backend API",
+    "description": "Complete API collection for the Prashanthja backend application.\n\n## Authentication\nMost endpoints require a Bearer token. After logging in or registering, copy the `accessToken` from the response and set it in the `token` collection variable.\n\n## Base URL\nDefault: `http://localhost:5000/api/v1`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chat_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "event_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "message_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints: login, registration, password management, and token refresh.",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with email and password. Returns access and refresh tokens."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set('token', res.data.accessToken);",
+                  "}",
+                  "if (res.data && res.data.refreshToken) {",
+                  "    pm.collectionVariables.set('refresh_token', res.data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Google Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"google_oauth_id_token_here\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/google-login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "google-login"]
+            },
+            "description": "Login or register using a Google OAuth ID token."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set('token', res.data.accessToken);",
+                  "}",
+                  "if (res.data && res.data.refreshToken) {",
+                  "    pm.collectionVariables.set('refresh_token', res.data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh-token"]
+            },
+            "description": "Refresh the access token using the refresh token stored in cookies."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set('token', res.data.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"currentPassword123\",\n  \"newPassword\": \"newPassword456\",\n  \"confirmPassword\": \"newPassword456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "change-password"]
+            },
+            "description": "Change password for the authenticated user. Requires: super_admin, sub_admin, admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "description": "Request a password reset email. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"newPassword456\",\n  \"confirmPassword\": \"newPassword456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "reset-password"]
+            },
+            "description": "Reset the password using the token received via email."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password-page",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "reset-password-page"]
+            },
+            "description": "Renders the password reset HTML page."
+          },
+          "response": []
+        },
+        {
+          "name": "Password Reset Success Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/password-reset-success",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "password-reset-success"]
+            },
+            "description": "Renders the password reset success page."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User management endpoints: registration, profile updates, and user administration.",
+      "item": [
+        {
+          "name": "Create User (Register)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phoneNumber\": \"+1234567890\",\n  \"address\": \"123 Main St, City\",\n  \"role\": \"user\",\n  \"password\": \"password123\"\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "profile",
+                  "type": "file",
+                  "src": "",
+                  "description": "Profile image file (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "Register a new user. Accepts multipart form data with a profile image and JSON data in the `data` field."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('user_id', res.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/my-profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "my-profile"]
+            },
+            "description": "Get the authenticated user's profile. Requires: super_admin, sub_admin, admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"name\": \"John Updated\",\n  \"phoneNumber\": \"+1234567890\",\n  \"address\": \"456 New St, City\",\n  \"bio\": \"Hello world\",\n  \"gender\": \"Male\",\n  \"dateOfBirth\": \"1990-01-15\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [-73.856077, 40.848447]\n  }\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "profile",
+                  "type": "file",
+                  "src": "",
+                  "description": "Profile image file (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/users/update-my-profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "update-my-profile"]
+            },
+            "description": "Update the authenticated user's profile. Accepts multipart form data. Requires: super_admin, sub_admin, admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Get a specific user by their ID. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users?page=1&limit=10&searchTerm=",
+              "host": ["{{base_url}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "searchTerm", "value": "", "description": "Search by name, email, etc." }
+              ]
+            },
+            "description": "Get all users with pagination. Requires: super_admin, sub_admin, admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User By ID (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"name\": \"Updated Name\",\n  \"status\": \"active\"\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "profile",
+                  "type": "file",
+                  "src": "",
+                  "description": "Profile image file (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Update a user by ID. Requires: admin, sub_admin, super_admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete My Account",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/delete-my-account",
+              "host": ["{{base_url}}"],
+              "path": ["users", "delete-my-account"]
+            },
+            "description": "Delete the authenticated user's own account. Requires: super_admin, sub_admin, admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User By ID (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "Delete a user by ID. Requires: admin, sub_admin, super_admin roles."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OTP",
+      "description": "OTP verification and resend endpoints.",
+      "item": [
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/otp/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["otp", "verify-otp"]
+            },
+            "description": "Verify a 6-digit OTP code."
+          },
+          "response": []
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/otp/resend-otp",
+              "host": ["{{base_url}}"],
+              "path": ["otp", "resend-otp"]
+            },
+            "description": "Resend an OTP to the specified email address."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "Notification endpoints.",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"]
+            },
+            "description": "Get all notifications for the authenticated user. Requires: user, admin, sub_admin, super_admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notifications As Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"]
+            },
+            "description": "Mark all notifications as read for the authenticated user. Requires: user, admin, sub_admin, super_admin roles."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contents",
+      "description": "Content management endpoints: banners, about us, terms, privacy policy, FAQ, etc.",
+      "item": [
+        {
+          "name": "Create Contents",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"aboutUs\": \"About us content here...\",\n  \"termsAndConditions\": \"Terms and conditions content...\",\n  \"privacyPolicy\": \"Privacy policy content...\",\n  \"supports\": \"Support information...\",\n  \"faq\": \"FAQ content...\"\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "banner",
+                  "type": "file",
+                  "src": "",
+                  "description": "Banner image(s) - up to 5 files"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/contents",
+              "host": ["{{base_url}}"],
+              "path": ["contents"]
+            },
+            "description": "Create content entries (banners, about us, terms, etc.). Requires: super_admin, sub_admin, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Contents",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"aboutUs\": \"Updated about us content...\",\n  \"termsAndConditions\": \"Updated terms...\",\n  \"privacyPolicy\": \"Updated privacy policy...\",\n  \"supports\": \"Updated support info...\",\n  \"faq\": \"Updated FAQ...\"\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "banner",
+                  "type": "file",
+                  "src": "",
+                  "description": "Banner image(s) - up to 5 files"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/contents",
+              "host": ["{{base_url}}"],
+              "path": ["contents"]
+            },
+            "description": "Update existing content entries. Requires: super_admin, sub_admin, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Contents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/contents",
+              "host": ["{{base_url}}"],
+              "path": ["contents"]
+            },
+            "description": "Get all content entries. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Contents By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/contents/:id",
+              "host": ["{{base_url}}"],
+              "path": ["contents", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Content document ID"
+                }
+              ]
+            },
+            "description": "Get a specific content entry by ID. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Banner By Key",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/contents/:key",
+              "host": ["{{base_url}}"],
+              "path": ["contents", ":key"],
+              "variable": [
+                {
+                  "key": "key",
+                  "value": "",
+                  "description": "Banner S3 key to delete"
+                }
+              ]
+            },
+            "description": "Delete a specific banner by its S3 key."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "description": "Chat management endpoints. Note: These routes may need to be registered in the main router.",
+      "item": [
+        {
+          "name": "Create Chat",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\"user_id_1\", \"receiver_id_2\"],\n  \"status\": \"accepted\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/chat",
+              "host": ["{{base_url}}"],
+              "path": ["chat"]
+            },
+            "description": "Create a new chat between two participants. Requires: admin, user roles."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('chat_id', res.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Update Chat",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\"user_id_1\", \"receiver_id_2\"],\n  \"status\": \"blocked\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/{{chat_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "{{chat_id}}"]
+            },
+            "description": "Update a chat by ID (e.g., block/unblock). Requires: admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Chat List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chat/my-chat-list",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "my-chat-list"]
+            },
+            "description": "Get the authenticated user's chat list. Requires: admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Chat By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chat/{{chat_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "{{chat_id}}"]
+            },
+            "description": "Get a specific chat by ID. Requires: admin, user roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Chat",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chat/{{chat_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "{{chat_id}}"]
+            },
+            "description": "Delete a chat by ID. Requires: admin, user roles."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "description": "Message endpoints for sending, viewing, and managing messages within chats. Note: These routes may need to be registered in the main router.",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"chat\": \"chat_id_here\",\n  \"text\": \"Hello, how are you?\",\n  \"receiver\": \"receiver_user_id\",\n  \"seen\": false\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "",
+                  "description": "Message image attachment (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/send-messages",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "send-messages"]
+            },
+            "description": "Send a new message in a chat. Requires: user, admin roles."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('message_id', res.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Update Message",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"chat\": \"chat_id_here\",\n  \"text\": \"Updated message text\",\n  \"receiver\": \"receiver_user_id\",\n  \"seen\": false\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "",
+                  "description": "Updated image attachment (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/update/{{message_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "update", "{{message_id}}"]
+            },
+            "description": "Update an existing message by ID. Requires: user, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Messages As Seen",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/seen/{{chat_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "seen", "{{chat_id}}"]
+            },
+            "description": "Mark all messages in a chat as seen. Requires: user, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Messages By Chat ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/my-messages/{{chat_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "my-messages", "{{chat_id}}"]
+            },
+            "description": "Get all messages for a specific chat. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Message By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/{{message_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "{{message_id}}"]
+            },
+            "description": "Get a specific message by ID. Requires: user, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["messages"]
+            },
+            "description": "Get all messages. Requires: user, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Message",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/{{message_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "{{message_id}}"]
+            },
+            "description": "Delete a message by ID. Requires: user, admin roles."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "description": "Event management endpoints. Note: These routes may need to be registered in the main router.",
+      "item": [
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"title\": \"Community Meetup\",\n  \"description\": \"A friendly neighborhood gathering\",\n  \"date\": \"2025-03-15T18:00:00.000Z\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [-73.856077, 40.848447]\n  }\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "",
+                  "description": "Event images - up to 5 files"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["events"]
+            },
+            "description": "Create a new event with images. Requires: user role."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data._id) {",
+                  "    pm.collectionVariables.set('event_id', res.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Update Event",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"title\": \"Updated Meetup Title\",\n  \"description\": \"Updated description\",\n  \"date\": \"2025-04-01T18:00:00.000Z\"\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "",
+                  "description": "Updated event images (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/events/{{event_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["events", "{{event_id}}"]
+            },
+            "description": "Update an event by ID. Requires: user, admin roles."
+          },
+          "response": []
+        },
+        {
+          "name": "Join Event",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/events/join/{{event_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["events", "join", "{{event_id}}"]
+            },
+            "description": "Join an event by ID. Requires: user role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events/my-events",
+              "host": ["{{base_url}}"],
+              "path": ["events", "my-events"]
+            },
+            "description": "Get all events created by the authenticated user. Requires: user role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/events?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["events"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Get all events with pagination. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Event By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{base_url}}/events/{{event_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["events", "{{event_id}}"]
+            },
+            "description": "Get a specific event by ID. No authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Event",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events/{{event_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["events", "{{event_id}}"]
+            },
+            "description": "Delete an event by ID. Requires: user, admin, super_admin roles."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
