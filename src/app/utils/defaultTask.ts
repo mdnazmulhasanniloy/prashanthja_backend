@@ -13,7 +13,12 @@ export async function defaultTask() {
       email: 'admin@gmail.com',
       phoneNumber: '+8801321834780',
       password: '112233',
-      role: 'admin',   
+      role: 'admin',
+      expireAt: null,
+      location: {
+        type: 'Point',
+        coordinates: [90.412518, 23.810331],
+      },
       verification: {
         otp: '0',
         status: true,

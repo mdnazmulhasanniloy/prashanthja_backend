@@ -10,19 +10,17 @@ import initializeSocketIO from './app/socket';
 import './app/job/croneJob';
 
 let server: Server;
-const socketServer = createServer(app);
-let currentPort: number = Number(config.port) | 5000;
-let portCount = 0;
+const socketServer = createServer(app); 
 
 async function main() {
   try {
     const io = await initializeSocketIO(socketServer);
     await mongoose.connect(config.database_url as string);
     defaultTask();
-    server = app.listen(Number(currentPort), config.ip as string, () => {
+    server = app.listen(Number(config.port), config.ip as string, () => {
       console.log(
         colors.italic.green.bold(
-          `💫 Simple Server Listening on  http://${config?.ip}:${currentPort} `,
+          `💫 Simple Server Listening on  http://${config?.ip}:${config.port} `,
         ),
       );
     });
@@ -31,14 +29,12 @@ async function main() {
       colors.yellow.bold(
         `⚡Socket.io running on  http://${config.ip}:${config.socket_port}`,
       ),
-    ); 
-    
+    );
   } catch (err) {
     console.error(err);
   }
 }
 main();
- 
 
 process.on('unhandledRejection', err => {
   console.log(`😈 unahandledRejection is detected , shutting down ...`, err);

@@ -4,9 +4,14 @@ import { userRoutes } from '../modules/user/user.route';
 import { authRoutes } from '../modules/auth/auth.route';
 import { notificationRoutes } from '../modules/notification/notificaiton.route';
 import { contentsRoutes } from '../modules/contents/contents.route';
+import { eventsRoutes } from '../modules/events/events.route';
 
 const router = Router();
 const moduleRoutes = [
+  {
+    path: '/events',
+    route: eventsRoutes,
+  },
   {
     path: '/users',
     route: userRoutes,

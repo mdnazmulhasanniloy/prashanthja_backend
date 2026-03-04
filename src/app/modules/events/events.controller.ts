@@ -4,7 +4,7 @@ import { eventsService } from './events.service';
 import sendResponse from '../../utils/sendResponse';
 
 const createEvents = catchAsync(async (req: Request, res: Response) => {
-  req.body['user'] = req.user?.id;
+  req.body['author'] = req.user?.userId;
   const result = await eventsService.createEvents(req.body);
   sendResponse(res, {
     statusCode: 201,
@@ -24,7 +24,7 @@ const getAllEvents = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getMyEvents = catchAsync(async (req: Request, res: Response) => {
-  req.query['user'] = req.user?.id;
+  req.query['author'] = req.user?.userId;
   const result = await eventsService.getAllEvents(req.query);
   sendResponse(res, {
     statusCode: 200,
@@ -53,11 +53,23 @@ const updateEvents = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const joinEvent = catchAsync(async (req: Request, res: Response) => {
-  const result = await eventsService.joinEvent(req.params.id, req.user?.id);
+  const result = await eventsService.joinEvent(req.params.id, req.user?.userId);
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'Events joined successfully',
+    data: result,
+  });
+});
+const removeFromEvent = catchAsync(async (req: Request, res: Response) => {
+  const result = await eventsService.removeFromEvent(
+    req.params.id,
+    req.user?.userId,
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Remove user form Event successfully',
     data: result,
   });
 });
@@ -80,4 +92,5 @@ export const eventsController = {
   deleteEvents,
   joinEvent,
   getMyEvents,
+  removeFromEvent,
 };

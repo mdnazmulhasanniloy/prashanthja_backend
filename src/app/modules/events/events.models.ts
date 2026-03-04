@@ -10,21 +10,22 @@ const eventsSchema = new Schema<IEvents>(
   {
     images: [
       {
-        key: {
-          type: String,
-          required: true,
-        },
-        url: {
-          type: String,
-          required: true,
-        },
+        type: String,
+        required: true,
       },
     ],
-    user:{
+    author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
+    joinedUsers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
+    ],
 
     description: {
       type: String,
@@ -54,7 +55,7 @@ const eventsSchema = new Schema<IEvents>(
 );
 
 eventsSchema.index({ title: 'text' }); // full-text search on title
-eventsSchema.index({ date: 1 });       // ascending index on date
+eventsSchema.index({ date: 1 }); // ascending index on date
 eventsSchema.index({ location: '2dsphere' }); // geo index
 
 const Events = model<IEvents, IEventsModules>('Events', eventsSchema);

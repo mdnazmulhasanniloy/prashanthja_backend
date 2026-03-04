@@ -1,19 +1,19 @@
 services:
-  app:
-    image: nazmulhasn/prashanthja_app:latest
-    container_name: prashanthja_app
-    restart: always
-    env_file:
-      - .env
-    environment:
-      - REDIS_HOST=prashanthja_redis
-      - REDIS_PORT=6379
-    ports:
-      - '2000:2000'
-      - '2005:2005' 
-    depends_on:
-      - redis
-    command: ['node', 'dist/server.js']
+  # app:
+  #   image: nazmulhasn/prashanthja_app:latest
+  #   container_name: prashanthja_app
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - REDIS_HOST=prashanthja_redis
+  #     - REDIS_PORT=6379
+  #   ports:
+  #     - '2000:2000'
+  #     - '2005:2005'
+  #   depends_on:
+  #     - redis
+  #   command: ['node', 'dist/server.js']
 
   redis:
     image: redis:7.2-alpine
