@@ -5,9 +5,14 @@ import { authRoutes } from '../modules/auth/auth.route';
 import { notificationRoutes } from '../modules/notification/notificaiton.route';
 import { contentsRoutes } from '../modules/contents/contents.route';
 import { eventsRoutes } from '../modules/events/events.route';
+import { joinRequestRoutes } from '../modules/joinRequest/joinRequest.route';
 
 const router = Router();
 const moduleRoutes = [
+  {
+    path: '/join-request',
+    route: joinRequestRoutes,
+  },
   {
     path: '/events',
     route: eventsRoutes,

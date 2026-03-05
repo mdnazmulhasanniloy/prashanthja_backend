@@ -4,7 +4,7 @@ import { pubClient } from '../../redis';
 import callbackFn from '../../utils/callbackFn';
 
 const getChatList = async (
-  io: Server, 
+  io: Server,
   user: any,
   callback: (arg: any) => void,
 ) => {
@@ -27,7 +27,7 @@ const getChatList = async (
       'userId_to_socketId',
       user?.userId?.toString(),
     )) as string;
-
+    console.log(userSocketId);
     io.to(userSocketId).emit('chat_list', chatList);
 
     callbackFn(callback, {
