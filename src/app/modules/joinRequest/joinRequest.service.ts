@@ -169,11 +169,7 @@ const updateJoinRequest = async (
 };
 
 const deleteJoinRequest = async (id: string) => {
-  const result = await JoinRequest.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true },
-  );
+  const result = await JoinRequest.findByIdAndDelete(id);
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete joinRequest');
   }

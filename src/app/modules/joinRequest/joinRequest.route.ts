@@ -6,11 +6,11 @@ import { USER_ROLE } from '../user/user.constants';
 const router = Router();
 
 router.post('/', auth(USER_ROLE.user), joinRequestController.createJoinRequest);
-router.patch(
-  '/:id',
-  auth(USER_ROLE.user),
-  joinRequestController.updateJoinRequest,
-);
+// router.patch(
+//   '/:id',
+//   auth(USER_ROLE.user),
+//   joinRequestController.updateJoinRequest,
+// );
 router.patch(
   '/approved/:id',
   auth(USER_ROLE.user),
