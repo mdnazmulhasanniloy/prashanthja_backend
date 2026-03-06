@@ -18,7 +18,7 @@ router.post(
   uploadMultiple(files),
   eventsController.createEvents,
 );
-router.patch('/join/:id', auth(USER_ROLE.user), eventsController.joinEvent);
+// router.patch('/join/:id', auth(USER_ROLE.user), eventsController.joinEvent);
 router.patch(
   '/remove/:id',
   auth(USER_ROLE.user, USER_ROLE.admin),
