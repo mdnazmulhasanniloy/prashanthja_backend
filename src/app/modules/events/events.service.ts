@@ -5,6 +5,7 @@ import AppError from '../../error/AppError';
 import pickQuery from '../../utils/pickQuery';
 import { Types } from 'mongoose';
 import { paginationHelper } from '../../helpers/pagination.helpers';
+import moment from 'moment';
 
 const createEvents = async (payload: IEvents) => {
   const result = await Events.create(payload);
@@ -16,7 +17,8 @@ const createEvents = async (payload: IEvents) => {
 
 const getAllEvents = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
-  const { searchTerm, latitude, longitude, author, ...filtersData } = filters;
+  const { searchTerm, latitude, longitude, author, date, ...filtersData } =
+    filters;
   if (author) {
     filtersData['author'] = new Types.ObjectId(author);
   }
@@ -35,6 +37,19 @@ const getAllEvents = async (query: Record<string, any>) => {
         maxDistance: parseFloat(5 as unknown as string) * 1609, // 5 miles to meters
         distanceField: 'dist.calculated',
         spherical: true,
+      },
+    });
+  }
+  if (date) {
+    const startOfDay = moment(date).startOf('day').toDate();
+    const endOfDay = moment(date).endOf('day').toDate();
+
+    pipeline.push({
+      $match: {
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
       },
     });
   }

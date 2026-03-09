@@ -80,7 +80,7 @@ const getAllUser = async (query: Record<string, any>) => {
   if (searchTerm) {
     pipeline.push({
       $match: {
-        $or: ['name', 'email', 'phoneNumber'].map(field => ({
+        $or: ['name', 'email', 'phoneNumber', 'address'].map(field => ({
           [field]: {
             $regex: searchTerm,
             $options: 'i',
@@ -169,7 +169,12 @@ const updateUser = async (id: string, payload: Partial<IUser>) => {
   return user;
 };
 
-const deleteUser = async (id: string) => {
+const deleteUser = async (id: string, payload: { password: string }) => {
+  const isExist = await User.findById(id);
+  if (!isExist) throw new AppError(httpStatus.NOT_FOUND, 'user not found');
+  if (!(await User.isPasswordMatched(payload.password, isExist.password))) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Password does not match');
+  }
   const user = await User.findByIdAndUpdate(
     id,
     { isDeleted: true },

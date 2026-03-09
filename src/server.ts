@@ -10,7 +10,8 @@ import initializeSocketIO from './app/socket';
 import './app/job/croneJob';
 
 let server: Server;
-const socketServer = createServer(app); 
+const socketServer = createServer(app);
+const socketIp = '103.186.20.117';
 
 async function main() {
   try {
@@ -27,7 +28,7 @@ async function main() {
     io.listen(Number(config.socket_port));
     console.log(
       colors.yellow.bold(
-        `⚡Socket.io running on  http://${config.ip}:${config.socket_port}`,
+        `⚡Socket.io running on  http://${socketIp}:${config.socket_port}`,
       ),
     );
   } catch (err) {

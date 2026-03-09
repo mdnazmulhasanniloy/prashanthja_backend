@@ -5,7 +5,7 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { uploadToS3 } from '../../utils/s3';
 import { otpServices } from '../otp/otp.service';
-import { User } from './user.models'; 
+import { User } from './user.models';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUser(req.body);
@@ -69,7 +69,7 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.deleteUser(req.params.id);
+  const result = await userService.deleteUser(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -79,7 +79,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteMYAccount = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.deleteUser(req.user?.userId);
+  const result = await userService.deleteUser(req.user?.userId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
