@@ -18,11 +18,19 @@ const sendMessage = async (
 ) => {
   try {
     if (!payload?.chat) {
-      const chat = await Chat.create({
-        participants: [payload?.receiver, payload?.sender],
-        status: 'accepted',
+      const existingChat = await Chat.findOne({
+        participants: { $all: [payload?.receiver, user?.userId] },
       });
-      payload.chat = chat._id?.toString();
+
+      if (existingChat) {
+        payload.chat = existingChat._id.toString();
+      } else {
+        const chat = await Chat.create({
+          participants: [payload?.receiver, user?.userId],
+          status: 'accepted',
+        });
+        payload.chat = chat._id.toString();
+      }
     }
 
     const message = {
@@ -40,7 +48,7 @@ const sendMessage = async (
     const [senderSocketId, receiverSocketId] = (await Promise.all([
       pubClient.hGet('userId_to_socketId', message.sender?.toString()),
       pubClient.hGet('userId_to_socketId', message.receiver?.toString()),
-    ])) as string[]; 
+    ])) as string[];
     io.to(senderSocketId).emit('new_message', { message });
     io.to(receiverSocketId).emit('new_message', { message });
     getChatList(io, { _id: payload.sender }, callback);
