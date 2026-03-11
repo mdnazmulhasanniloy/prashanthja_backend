@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import Chat from '../../modules/chat/chat.models';
 import { IChat } from '../../modules/chat/chat.interface';
 import getChatList from './chatList.handlers';
+import { invalidateUserCache } from './invalidCash';
 
 const SeenMessageHandlers = async (
   io: any,
@@ -34,12 +35,13 @@ const SeenMessageHandlers = async (
         receiver: new Types.ObjectId(user?.userId),
         seen: false,
       },
-      { seen: true },
+      { $set: { seen: true } },
     );
 
     const user1 = chat?.participants[0];
     const user2 = chat?.participants[1];
-    console.log({ user1, user2 });
+    invalidateUserCache(user1?.toString());
+    invalidateUserCache(user2?.toString());
     getChatList(
       io,
       { userId: user1?.toString() },
