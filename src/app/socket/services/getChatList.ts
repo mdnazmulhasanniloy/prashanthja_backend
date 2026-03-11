@@ -1,16 +1,26 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/AppError';
 import Chat from '../../modules/chat/chat.models';
-import Message from '../../modules/messages/messages.models'; 
+import Message from '../../modules/messages/messages.models';
 
-export const getMyChatList = async (userId: string) => {
+export const getMyChatList = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 10,
+) => {
+  const skip = (page - 1) * limit;
+
   const chats = await Chat.find({
     participants: { $all: userId },
-  }).populate({
-    path: 'participants',
-    select: 'name email profile role _id phoneNumber',
-    match: { _id: { $ne: userId } },
-  });
+  })
+    .populate({
+      path: 'participants',
+      select: 'name email profile role _id phoneNumber',
+      match: { _id: { $ne: userId } },
+    })
+    .sort({ updatedAt: -1 }) // latest updated chats first
+    .skip(skip)
+    .limit(limit);
 
   if (!chats) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Chat list not found');
@@ -68,5 +78,20 @@ export const getMyChatList = async (userId: string) => {
     const dateB = (b.message?.createdAt as any) || 0;
     return new Date(dateB).getTime() - new Date(dateA).getTime();
   });
-  return data;
+
+  // 8️⃣ Total chat count for pagination info
+  const totalCount = await Chat.countDocuments({
+    participants: { $all: [userId] },
+  });
+
+  return {
+    chats: data,
+    pagination: {
+      page,
+      limit,
+      total: totalCount,
+      totalPage: Math.ceil(totalCount / limit),
+      hasMore: skip + data.length < totalCount,
+    },
+  };
 };

@@ -7,17 +7,18 @@ import Message from '../../modules/messages/messages.models';
 
 const MessagePageHandlers = async (
   io: Server,
-  userId: string,
+  payload: { userId: string; limit: number; page: number },
   currentUserId: string,
   callback: (data: any) => void,
 ) => {
+  const { userId, page = 1, limit = 10 } = payload;
   if (!userId) {
     return callbackFn(callback, {
       success: false,
       message: 'userId is required',
     });
   }
-
+  const skip = (page - 1) * limit;
   try {
     // 1️⃣ Check Redis cache for receiver details
     const receiverCacheKey = `user_details:${userId}`;
@@ -72,7 +73,7 @@ const MessagePageHandlers = async (
     io.to(userSocket).emit('user_details', payload);
 
     // 4️⃣ Redis caching for messages
-    const messageCacheKey = `messages:${currentUserId}:${userId}`;
+    const messageCacheKey = `messages:${currentUserId}:${userId}:${page}:${limit}`;
     let getPreMessage;
 
     const cachedMessages = await pubClient.get(messageCacheKey);
@@ -84,20 +85,43 @@ const MessagePageHandlers = async (
           { sender: currentUserId, receiver: userId },
           { sender: userId, receiver: currentUserId },
         ],
-      }).sort({ updatedAt: 1 });
+      })
+        .sort({ updatedAt: 1 })
+        .skip(skip)
+        .limit(limit);
 
       await pubClient.setEx(messageCacheKey, 30, JSON.stringify(getPreMessage));
     }
 
+    // 4️⃣ Total Message Count
+    const totalMessages = await Message.countDocuments({
+      $or: [
+        { sender: currentUserId, receiver: userId },
+        { sender: userId, receiver: currentUserId },
+      ],
+    });
+    const messages = getPreMessage.reverse();
+
+    const response = {
+      data: messages,
+      meta: {
+        page,
+        limit,
+        total: totalMessages,
+        totalPage: Math.ceil(totalMessages / limit),
+        hasMore: skip + getPreMessage.length < totalMessages,
+      },
+    };
+
     // 5️⃣ Emit previous messages
-    io.to(userSocket).emit('message', getPreMessage || []);
+    io.to(userSocket).emit('message', response || []);
 
     // 6️⃣ Final callback
     callbackFn(callback, {
       success: true,
       message: 'Message page data retrieved successfully',
       data: {
-        getPreMessage,
+        ...response,
         userDetails: payload,
       },
     });

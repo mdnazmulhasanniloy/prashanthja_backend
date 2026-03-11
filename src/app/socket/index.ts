@@ -42,12 +42,16 @@ const initializeSocketIO = async (server: HttpServer) => {
     //message page
     socket.on(
       'message_page',
-      async (payload: { userId: string }, callback: any) =>
-        MessagePageHandlers(io, payload?.userId, userId, callback),
+      async (
+        payload: { userId: string; limit: number; page: number },
+        callback: any,
+      ) => MessagePageHandlers(io, payload, userId, callback),
     );
     //my chat list
-    socket.on('my_chat_list', async ({}, callback: any) =>
-      getChatList(io, socket?.data, callback),
+    socket.on(
+      'my_chat_list',
+      async (payload: { limit: number; page: number }, callback: any) =>
+        getChatList(io, socket?.data, payload, callback),
     );
 
     //seen message

@@ -1,9 +1,9 @@
-import callbackFn from '../../utils/callbackFn'; 
+import callbackFn from '../../utils/callbackFn';
 import Message from '../../modules/messages/messages.models';
 import { Types } from 'mongoose';
 import Chat from '../../modules/chat/chat.models';
 import { IChat } from '../../modules/chat/chat.interface';
-import getChatList from './chatList.handlers'; 
+import getChatList from './chatList.handlers';
 
 const SeenMessageHandlers = async (
   io: any,
@@ -37,8 +37,8 @@ const SeenMessageHandlers = async (
     );
     const user1 = chat.participants[0];
     const user2 = chat.participants[1];
-    getChatList(io, { _id: user1 }, callback);
-    getChatList(io, { _id: user2 }, callback);
+    getChatList(io, { _id: user1 },{}, callback);
+    getChatList(io, { _id: user2 },{}, callback);
   } catch (error: any) {
     return callbackFn(callback, {
       success: false,

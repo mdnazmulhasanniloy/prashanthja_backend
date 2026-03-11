@@ -6,10 +6,13 @@ import callbackFn from '../../utils/callbackFn';
 const getChatList = async (
   io: Server,
   user: any,
+  payload: { limit?: number; page?: number },
   callback: (arg: any) => void,
 ) => {
+  const { page = 1, limit = 10 } = payload;
+  const skip = (page - 1) * limit;
   try {
-    const redisKey = `chat_list:${user.userId}`;
+    const redisKey = `chat_list:${user.userId}:${page}:${limit}`;
     const cachedChatList = await pubClient.get(redisKey);
 
     let chatList;
@@ -17,7 +20,7 @@ const getChatList = async (
     if (cachedChatList) {
       chatList = JSON.parse(cachedChatList);
     } else {
-      chatList = await getMyChatList(user.userId);
+      chatList = await getMyChatList(user.userId, page, limit);
       await pubClient.set(redisKey, JSON.stringify(chatList), {
         EX: 30, // Cache 30s
       });
@@ -26,8 +29,7 @@ const getChatList = async (
     const userSocketId = (await pubClient.hGet(
       'userId_to_socketId',
       user?.userId?.toString(),
-    )) as string;
-    console.log(userSocketId);
+    )) as string; 
     io.to(userSocketId).emit('chat_list', chatList);
 
     callbackFn(callback, {
