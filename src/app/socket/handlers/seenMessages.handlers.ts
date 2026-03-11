@@ -20,6 +20,7 @@ const SeenMessageHandlers = async (
 
   try {
     const chat: IChat | null = await Chat.findById(chatId);
+
     if (!chat) {
       return callbackFn(callback, {
         success: false,
@@ -27,7 +28,7 @@ const SeenMessageHandlers = async (
       });
     }
 
-    Message.updateMany(
+    await Message.updateMany(
       {
         chat: new Types.ObjectId(chatId),
         receiver: new Types.ObjectId(user?.userId),
@@ -35,11 +36,24 @@ const SeenMessageHandlers = async (
       },
       { seen: true },
     );
-    const user1 = chat.participants[0];
-    const user2 = chat.participants[1];
-    getChatList(io, { _id: user1 },{}, callback);
-    getChatList(io, { _id: user2 },{}, callback);
+
+    const user1 = chat?.participants[0];
+    const user2 = chat?.participants[1];
+    console.log({ user1, user2 });
+    getChatList(
+      io,
+      { userId: user1?.toString() },
+      { page: 1, limit: 10 },
+      callback,
+    );
+    getChatList(
+      io,
+      { userId: user2?.toString() },
+      { page: 1, limit: 10 },
+      callback,
+    );
   } catch (error: any) {
+    console.log(error);
     return callbackFn(callback, {
       success: false,
       message: error?.message || 'seen message failed',
