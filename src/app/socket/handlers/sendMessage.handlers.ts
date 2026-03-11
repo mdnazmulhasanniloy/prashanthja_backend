@@ -51,8 +51,8 @@ const sendMessage = async (
     ])) as string[];
     io.to(senderSocketId).emit('new_message', { message });
     io.to(receiverSocketId).emit('new_message', { message });
-    getChatList(io, { _id: payload.sender }, callback);
-    getChatList(io, { _id: payload.receiver }, callback);
+    getChatList(io, { userId: payload.sender },{}, callback);
+    getChatList(io, { userId: payload.receiver },{}, callback);
     callbackFn<IPayload>(callback, {
       success: true,
       message: 'message send successfully',

@@ -9,6 +9,7 @@ import MessagePageHandlers from './handlers/massagePage.handlers';
 import getChatList from './handlers/chatList.handlers';
 import SeenMessageHandlers from './handlers/seenMessages.handlers';
 import sendMessage from './handlers/sendMessage.handlers';
+import Chat from '../modules/chat/chat.models';
 
 const initializeSocketIO = async (server: HttpServer) => {
   await connectRedis();
@@ -62,6 +63,37 @@ const initializeSocketIO = async (server: HttpServer) => {
     socket.on('send_message', async (payload: any, callback: any) =>
       sendMessage(io, payload, socket?.data, callback),
     );
+
+    //-----------------------Typing------------------------//
+    socket.on('typing', async function (data) {
+      const chat = await Chat.findById(data.chatId);
+      const receiverId =
+        chat?.participants[0]?.toString() === socket.data.userId.toString()
+          ? chat?.participants[1]?.toString()
+          : chat?.participants[0]?.toString();
+      console.log('🚀 ~ initializeSocketIO ~ receiverId:', receiverId);
+      const userSocketId = (await pubClient.hGet(
+        'userId_to_socketId',
+        receiverId as string,
+      )) as string;
+      const message = socket?.data?.name + ' is typing...';
+      io.to(userSocketId).emit('typing', { message: message });
+    });
+
+    socket.on('stopTyping', async function (data) {
+      const chat = await Chat.findById(data.chatId);
+      const receiverId =
+        chat?.participants[0]?.toString() === socket.data.userId.toString()
+          ? chat?.participants[1]?.toString()
+          : chat?.participants[0]?.toString();
+
+      const userSocketId = (await pubClient.hGet(
+        'userId_to_socketId',
+        receiverId as string,
+      )) as string;
+      const message = socket?.data?.name + ' is stop typing...';
+      io.to(userSocketId).emit('stopTyping', { message: message });
+    });
 
     socket.on('disconnect', async () => {
       console.log(`Client disconnected: ${socket.id}`);
