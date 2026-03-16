@@ -22,6 +22,7 @@ export interface IUser {
   status: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
+  accommodationAvailable: boolean;
   isDeleted: boolean;
   location: ILocation;
   expireAt: Date;

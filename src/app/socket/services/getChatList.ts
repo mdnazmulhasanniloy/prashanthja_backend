@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import AppError from '../../error/AppError';
 import Chat from '../../modules/chat/chat.models';
 import Message from '../../modules/messages/messages.models';
+import { Types } from 'mongoose';
 
 export const getMyChatList = async (
   userId: string,
@@ -45,8 +46,8 @@ export const getMyChatList = async (
     {
       $match: {
         chat: { $in: chatIds },
+        sender: { $ne: new Types.ObjectId(userId) },
         seen: false,
-        sender: { $ne: userId },
       },
     },
     {

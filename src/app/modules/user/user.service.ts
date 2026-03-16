@@ -49,6 +49,110 @@ const createUser = async (payload: IUser): Promise<IUser> => {
   return user;
 };
 
+const getAccommodation = async (query: Record<string, any>, userId: string) => {
+  const { filters, pagination } = await pickQuery(query);
+  const { searchTerm, latitude, longitude, ...filtersData } = filters;
+
+  const pipeline: any[] = [];
+
+  if (latitude && longitude) {
+    pipeline.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [parseFloat(longitude), parseFloat(latitude)],
+        },
+        key: 'location',
+        maxDistance: parseFloat(5 as unknown as string) * 1609, // 5 miles to meters
+        distanceField: 'dist.calculated',
+        spherical: true,
+      },
+    });
+  }
+
+  pipeline.push({
+    $match: {
+      isDeleted: false,
+      _id: { $ne: new Types.ObjectId(userId) },
+      accommodationAvailable: true,
+    },
+  });
+
+  // If searchTerm is provided, add a search condition
+  if (searchTerm) {
+    pipeline.push({
+      $match: {
+        $or: ['name', 'email', 'phoneNumber', 'address'].map(field => ({
+          [field]: {
+            $regex: searchTerm,
+            $options: 'i',
+          },
+        })),
+      },
+    });
+  }
+
+  if (Object.entries(filtersData).length) {
+    Object.entries(filtersData).forEach(([field, value]) => {
+      if (/^\[.*?\]$/.test(value)) {
+        const match = value.match(/\[(.*?)\]/);
+        const queryValue = match ? match[1] : value;
+        pipeline.push({
+          $match: {
+            [field]: { $in: [new Types.ObjectId(queryValue)] },
+          },
+        });
+        delete filtersData[field];
+      } else {
+        // 🔁 Convert to number if numeric string
+        if (!isNaN(value)) {
+          filtersData[field] = Number(value);
+        }
+      }
+    });
+
+    if (Object.entries(filtersData).length) {
+      pipeline.push({
+        $match: {
+          $and: Object.entries(filtersData).map(([field, value]) => ({
+            isDeleted: false,
+            [field]: value,
+          })),
+        },
+      });
+    }
+  }
+  const { page, limit, skip, sort } =
+    paginationHelper.calculatePagination(pagination);
+
+  if (sort) {
+    const sortArray = sort.split(',').map(field => {
+      const trimmedField = field.trim();
+      if (trimmedField.startsWith('-')) {
+        return { [trimmedField.slice(1)]: -1 };
+      }
+      return { [trimmedField]: 1 };
+    });
+    pipeline.push({ $sort: Object.assign({}, ...sortArray) });
+  }
+
+  pipeline.push({
+    $facet: {
+      totalData: [{ $count: 'total' }],
+      paginatedData: [{ $skip: skip }, { $limit: limit }],
+    },
+  });
+
+  const [result] = await User.aggregate(pipeline);
+
+  const total = result?.totalData?.[0]?.total || 0;
+  const data = result?.paginatedData || [];
+
+  return {
+    meta: { page, limit, total },
+    data,
+  };
+};
 const getAllUser = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
   const { searchTerm, latitude, longitude, ...filtersData } = filters;
@@ -193,5 +297,6 @@ export const userService = {
   getAllUser,
   geUserById,
   updateUser,
+  getAccommodation,
   deleteUser,
 };

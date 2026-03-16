@@ -3,9 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { userService } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
-import { uploadToS3 } from '../../utils/s3';
 import { otpServices } from '../otp/otp.service';
-import { User } from './user.models';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUser(req.body);
@@ -15,6 +13,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: 'User created successfully',
     data: { user: result, otpToken: sendOtp },
+  });
+});
+
+const getAccommodation = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.getAccommodation(
+    req.query,
+    req?.user?.userId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users fetched successfully',
+    data: result,
   });
 });
 
@@ -59,6 +70,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.body);
   const result = await userService.updateUser(req?.user?.userId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -97,4 +109,5 @@ export const userController = {
   updateMyProfile,
   deleteUser,
   deleteMYAccount,
+  getAccommodation,
 };
