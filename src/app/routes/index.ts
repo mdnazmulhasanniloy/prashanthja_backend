@@ -6,6 +6,7 @@ import { notificationRoutes } from '../modules/notification/notificaiton.route';
 import { contentsRoutes } from '../modules/contents/contents.route';
 import { eventsRoutes } from '../modules/events/events.route';
 import { joinRequestRoutes } from '../modules/joinRequest/joinRequest.route';
+import { chatRoutes } from '../modules/chat/chat.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -36,6 +37,10 @@ const moduleRoutes = [
   {
     path: '/contents',
     route: contentsRoutes,
+  },
+  {
+    path: '/chat',
+    route: chatRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

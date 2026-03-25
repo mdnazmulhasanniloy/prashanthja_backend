@@ -22,6 +22,15 @@ const getMyChatList = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getChatByUserId = catchAsync(async (req: Request, res: Response) => {
+  const result = await chatService.getChatByUserId(req.user.userId, req.params.userId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Chat retrieved successfully',
+    data: result,
+  });
+});
 
 const getChatById = catchAsync(async (req: Request, res: Response) => {
   const result = await chatService.getChatById(req.params.id);
@@ -57,6 +66,6 @@ export const chatController = {
   createChat,
   getMyChatList,
   getChatById,
-  updateChat,
+  updateChat,getChatByUserId,
   deleteChat,
 };

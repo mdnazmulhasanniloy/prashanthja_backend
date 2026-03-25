@@ -4,7 +4,6 @@ export interface IJoinRequest {
   user: ObjectId;
   event: ObjectId;
   status: 'pending' | 'approved' | 'rejected';
-
   createdAt: Date;
   updatedAt: Date;
 }

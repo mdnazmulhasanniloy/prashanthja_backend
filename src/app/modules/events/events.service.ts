@@ -182,7 +182,9 @@ const getAllEvents = async (query: Record<string, any>) => {
 };
 
 const getEventsById = async (id: string) => {
-  const result = await Events.findById(id);
+  const result = await Events.findById(id).populate([
+    { path: 'author', select: '_id name email profile phoneNumber' },
+  ]);
   if (!result || result?.isDeleted) {
     throw new AppError(httpStatus.NOT_FOUND, 'Events not found!');
   }

@@ -1,12 +1,11 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/AppError';
 import Message from './messages.models';
-import QueryBuilder from '../../builder/QueryBuilder';
 import { deleteFromS3 } from '../../utils/s3';
 import { IMessages } from './messages.interface';
 import Chat from '../chat/chat.models';
 import { chatService } from '../chat/chat.service';
-import { io } from '../../../server';
+import QueryBuilder from '../../class/builder/QueryBuilder';
 
 const createMessages = async (payload: IMessages) => {
   const alreadyExists = await Chat.findOne({
@@ -28,6 +27,8 @@ const createMessages = async (payload: IMessages) => {
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Message creation failed');
   }
+
+  const io = global.socketio;
 
   if (io) {
     const senderMessage = 'new-message::' + result.chat.toString();

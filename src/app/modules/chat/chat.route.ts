@@ -44,6 +44,14 @@ router.get(
   ),
   chatController.getMyChatList,
 );
+router.get(
+  '/find-chat-by-user/:userId',
+  auth(
+    USER_ROLE.admin, 
+    USER_ROLE.user,
+  ),
+  chatController.getChatByUserId,
+);
 
 router.get(
   '/:id',

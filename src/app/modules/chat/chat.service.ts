@@ -5,6 +5,7 @@ import { IChat } from './chat.interface';
 import Message from '../messages/messages.models';
 import { deleteFromS3 } from '../../utils/s3';
 import { User } from '../user/user.models';
+import { startSession, Types } from 'mongoose';
 
 // Create chat
 const createChat = async (payload: IChat) => {
@@ -90,6 +91,19 @@ const getChatById = async (id: string) => {
   }
   return result;
 };
+const getChatByUserId = async (currentUser: string, secondUser: string) => {
+  const result = await Chat.findOne({
+    participants: { $all: [currentUser, secondUser] },
+  }).populate({
+    path: 'participants',
+    select: 'name email image role _id phoneNumber ',
+  });
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Chat not found');
+  }
+  return result;
+};
 
 // Update chat list
 const updateChatList = async (id: string, payload: Partial<IChat>) => {
@@ -102,12 +116,34 @@ const updateChatList = async (id: string, payload: Partial<IChat>) => {
 
 // Delete chat list
 const deleteChatList = async (id: string) => {
-  await deleteFromS3(`images/messages/${id}`);
-  const result = await Chat.findByIdAndDelete(id);
-  if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Chat not found');
+  const session = await startSession();
+
+  try {
+    session.startTransaction();
+
+    // 1. delete messages
+    await Message.deleteMany({ chat: new Types.ObjectId(id) }, { session });
+
+    // 2. delete chat
+    const result = await Chat.findByIdAndDelete(id, { session });
+
+    if (!result) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Chat not found');
+    }
+
+    // ✅ commit DB changes first
+    await session.commitTransaction();
+    session.endSession();
+
+    // 3. delete S3 AFTER commit (important)
+    await deleteFromS3(`images/messages/${id}`);
+
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-  return result;
 };
 
 export const chatService = {
@@ -116,4 +152,5 @@ export const chatService = {
   getChatById,
   updateChatList,
   deleteChatList,
+  getChatByUserId,
 };

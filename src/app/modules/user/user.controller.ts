@@ -17,10 +17,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAccommodation = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.getAccommodation(
-    req.query,
-    req?.user?.userId,
-  );
+  const result = await userService.getAccommodation(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

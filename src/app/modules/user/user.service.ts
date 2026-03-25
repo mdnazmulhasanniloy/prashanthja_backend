@@ -9,6 +9,7 @@ import config from '../../config';
 import pickQuery from '../../utils/pickQuery';
 import { Types } from 'mongoose';
 import { paginationHelper } from '../../helpers/pagination.helpers';
+import { USER_ROLE } from './user.constants';
 
 export type IFilter = {
   searchTerm?: string;
@@ -49,7 +50,7 @@ const createUser = async (payload: IUser): Promise<IUser> => {
   return user;
 };
 
-const getAccommodation = async (query: Record<string, any>, userId: string) => {
+const getAccommodation = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
   const { searchTerm, latitude, longitude, ...filtersData } = filters;
 
@@ -73,7 +74,7 @@ const getAccommodation = async (query: Record<string, any>, userId: string) => {
   pipeline.push({
     $match: {
       isDeleted: false,
-      _id: { $ne: new Types.ObjectId(userId) },
+      role: { $ne: USER_ROLE.admin },
       accommodationAvailable: true,
     },
   });
