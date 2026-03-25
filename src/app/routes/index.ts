@@ -8,9 +8,14 @@ import { eventsRoutes } from '../modules/events/events.route';
 import { joinRequestRoutes } from '../modules/joinRequest/joinRequest.route';
 import { chatRoutes } from '../modules/chat/chat.route';
 import uploadRouter from '../modules/uploads/route';
+import { dashboardRoutes } from '../modules/dashboard/dashboard.route';
 
 const router = Router();
 const moduleRoutes = [
+  {
+    path: '/dashboard',
+    route: dashboardRoutes,
+  },
   {
     path: '/join-request',
     route: joinRequestRoutes,
