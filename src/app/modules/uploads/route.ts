@@ -7,7 +7,7 @@ const storage = memoryStorage();
 const upload = multer({ storage });
 
 router.post(
-  '/',
+  '/multiple',
   upload.fields([
     { name: 'images', maxCount: 5 },
     { name: 'videos', maxCount: 5 },
