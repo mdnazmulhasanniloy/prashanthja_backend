@@ -8,6 +8,7 @@ export interface IEvents {
   title: string;
   description: string;
   date: Date;
+  address: string;
   location: ILocation;
   isDeleted: boolean;
 }

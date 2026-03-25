@@ -7,6 +7,7 @@ import { contentsRoutes } from '../modules/contents/contents.route';
 import { eventsRoutes } from '../modules/events/events.route';
 import { joinRequestRoutes } from '../modules/joinRequest/joinRequest.route';
 import { chatRoutes } from '../modules/chat/chat.route';
+import uploadRouter from '../modules/uploads/route';
 
 const router = Router();
 const moduleRoutes = [
@@ -17,6 +18,10 @@ const moduleRoutes = [
   {
     path: '/events',
     route: eventsRoutes,
+  },
+  {
+    path: '/uploads',
+    route: uploadRouter,
   },
   {
     path: '/users',

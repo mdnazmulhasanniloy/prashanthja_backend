@@ -41,7 +41,10 @@ const eventsSchema = new Schema<IEvents>(
       type: Date,
       required: true,
     },
-
+    address: {
+      type: String,
+      required: true,
+    },
     location: {
       type: LocationSchema,
       required: true,
