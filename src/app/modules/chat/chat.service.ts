@@ -106,6 +106,42 @@ const getChatByUserId = async (currentUser: string, secondUser: string) => {
 };
 
 // Update chat list
+const blockedChat = async (id: string, blockBy: string) => {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid chat id');
+  }
+
+  if (!Types.ObjectId.isValid(blockBy)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user id');
+  }
+
+  const updatedChat = await Chat.findOneAndUpdate(
+    { _id: id },
+    [
+      {
+        $set: {
+          status: {
+            $cond: [{ $eq: ['$status', 'blocked'] }, 'accepted', 'blocked'],
+          },
+          blockBy: {
+            $cond: [{ $eq: ['$status', 'blocked'] }, null, blockBy],
+          },
+        },
+      },
+    ],
+    {
+      new: true,
+      lean: true,
+    },
+  );
+
+  if (!updatedChat) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Chat not found');
+  }
+
+  return updatedChat;
+};
+
 const updateChatList = async (id: string, payload: Partial<IChat>) => {
   const result = await Chat.findByIdAndUpdate(id, payload, { new: true });
   if (!result) {
@@ -153,4 +189,5 @@ export const chatService = {
   updateChatList,
   deleteChatList,
   getChatByUserId,
+  blockedChat,
 };

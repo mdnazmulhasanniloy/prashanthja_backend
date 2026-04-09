@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { IChat, IChatModel } from './chat.interface';
 
 const chatSchema = new Schema<IChat>(
@@ -13,6 +13,11 @@ const chatSchema = new Schema<IChat>(
       type: String,
       enum: ['accepted', 'blocked'],
       default: 'accepted',
+    },
+    blockedBy: {
+      type: Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
   },
   { timestamps: true },

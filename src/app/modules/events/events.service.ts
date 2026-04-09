@@ -17,11 +17,19 @@ const createEvents = async (payload: IEvents) => {
 
 const getAllEvents = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
-  const { searchTerm, latitude, longitude, author, date, ...filtersData } =
-    filters;
+  const {
+    searchTerm,
+    latitude,
+    longitude,
+    author,
+    date,
+    afterDate,
+    ...filtersData
+  } = filters;
   if (author) {
     filtersData['author'] = new Types.ObjectId(author);
   }
+
   console.log(filtersData);
 
   const pipeline: any[] = [];
@@ -40,6 +48,7 @@ const getAllEvents = async (query: Record<string, any>) => {
       },
     });
   }
+
   if (date) {
     const startOfDay = moment(date).startOf('day').toDate();
     const endOfDay = moment(date).endOf('day').toDate();
@@ -52,6 +61,10 @@ const getAllEvents = async (query: Record<string, any>) => {
         },
       },
     });
+  }
+
+  if (afterDate) {
+    filtersData['date'] = { $gt: new Date(afterDate) };
   }
 
   pipeline.push({

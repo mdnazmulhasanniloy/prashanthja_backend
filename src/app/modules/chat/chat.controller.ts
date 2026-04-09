@@ -13,7 +13,7 @@ const createChat = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMyChatList = catchAsync(async (req: Request, res: Response) => { 
+const getMyChatList = catchAsync(async (req: Request, res: Response) => {
   const result = await chatService.getMyChatList(req.user.userId);
   sendResponse(res, {
     statusCode: 200,
@@ -23,7 +23,10 @@ const getMyChatList = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getChatByUserId = catchAsync(async (req: Request, res: Response) => {
-  const result = await chatService.getChatByUserId(req.user.userId, req.params.userId);
+  const result = await chatService.getChatByUserId(
+    req.user.userId,
+    req.params.userId,
+  );
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -34,7 +37,7 @@ const getChatByUserId = catchAsync(async (req: Request, res: Response) => {
 
 const getChatById = catchAsync(async (req: Request, res: Response) => {
   const result = await chatService.getChatById(req.params.id);
-  sendResponse( res, {
+  sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'Chat retrieved successfully',
@@ -43,6 +46,7 @@ const getChatById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateChat = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.body);
   const result = await chatService.updateChatList(req.params.id, req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -61,11 +65,22 @@ const deleteChat = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const blockedChat = catchAsync(async (req: Request, res: Response) => {
+  const result = await chatService.blockedChat(req.params.id, req.user.userId)
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: `Chat ${result?.status} successfully`,
+    data: result,
+  });
+});
 
 export const chatController = {
   createChat,
   getMyChatList,
   getChatById,
-  updateChat,getChatByUserId,
+  updateChat,
+  getChatByUserId,
   deleteChat,
+  blockedChat,
 };
