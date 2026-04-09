@@ -16,8 +16,8 @@ router.post(
 
 router.patch(
   '/blocked/:id',
-  auth(USER_ROLE.admin, USER_ROLE.user), 
-  chatController.updateChat,
+  auth(USER_ROLE.admin, USER_ROLE.user),
+  chatController.blockedChat,
 );
 router.patch(
   '/:id',
