@@ -20,7 +20,8 @@ WORKDIR /app
 
 # copy only production dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+# RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # copy build output from builder stage
 # COPY --from=builder /app/dist ./dist

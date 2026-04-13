@@ -9,8 +9,8 @@ services:
       - REDIS_HOST=prashanthja_redis
       - REDIS_PORT=6379
     ports:
-      - '4000:4000'
-      - '4005:4005'
+      - '2000:2000'
+      - '2005:2005'
     depends_on:
       - redis
     command: ['node', 'dist/server.js']
@@ -19,7 +19,7 @@ services:
     image: redis:7.2-alpine
     container_name: prashanthja_redis
     ports:
-      - 6380:6379
+      - 6379:6379
     volumes:
       - redis-data:/data
     restart: always
