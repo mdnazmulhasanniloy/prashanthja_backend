@@ -23,8 +23,9 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 # copy build output from builder stage
+# COPY --from=builder /app/dist ./dist
+# COPY --from=builder /app/. .
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/. .
 
 EXPOSE 2000
 EXPOSE 2005 
