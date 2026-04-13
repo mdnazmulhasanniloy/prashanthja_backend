@@ -10,7 +10,6 @@ import httpStatus from 'http-status';
 import { chatService } from '../chat/chat.service';
 import Chat from '../chat/chat.models';
 import { IChat } from '../chat/chat.interface';
-import { io } from '../../../server';
 import { storeFile } from '../../utils/fileHelper';
 
 const createMessages = catchAsync(async (req: Request, res: Response) => {
@@ -111,10 +110,11 @@ const seenMessage = catchAsync(async (req: Request, res: Response) => {
   const user1Chat = 'chat-list::' + user1;
 
   const user2Chat = 'chat-list::' + user2;
-
-  io.emit(user1Chat, ChatListUser1);
-  io.emit(user2Chat, ChatListUser2);
-
+  const io = global.socketio;
+  if (io) {
+    io.emit(user1Chat, ChatListUser1);
+    io.emit(user2Chat, ChatListUser2);
+  }
   sendResponse(res, {
     statusCode: 200,
     success: true,
