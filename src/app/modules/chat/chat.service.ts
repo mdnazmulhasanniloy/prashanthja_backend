@@ -39,7 +39,7 @@ const createChat = async (payload: IChat) => {
 // Get my chat list
 const getMyChatList = async (userId: string) => {
   const chats = await Chat.find({
-    participants: { $all: userId },
+    participants: { $in: [userId] },
   }).populate({
     path: 'participants',
     select: 'name email profile role _id phoneNumber',

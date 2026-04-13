@@ -25,7 +25,7 @@ export interface IUser {
   accommodationAvailable: boolean;
   isDeleted: boolean;
   location: ILocation;
-  expireAt: Date;
+  expireAt?: Date | null;
   verification: {
     otp: string | number;
     expiresAt: Date;

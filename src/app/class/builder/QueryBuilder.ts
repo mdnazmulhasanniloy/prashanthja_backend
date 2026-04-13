@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { FilterQuery, Query } from 'mongoose';
+import { Query } from 'mongoose';
+import type { FilterQuery } from 'mongoose';
 
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
