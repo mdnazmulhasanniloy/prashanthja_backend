@@ -158,7 +158,7 @@ const deleteChatList = async (id: string) => {
     session.startTransaction();
 
     // 1. delete messages
-    await Message.deleteMany({ chat: new Types.ObjectId(id) }, { session });
+    await Message.deleteMany({ chat: id as any }, { session });
 
     // 2. delete chat
     const result = await Chat.findByIdAndDelete(id, { session });

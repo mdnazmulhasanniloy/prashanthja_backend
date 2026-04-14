@@ -12,7 +12,7 @@ export const getMyChatList = async (
   const skip = (page - 1) * limit;
 
   const chats = await Chat.find({
-    participants: { $all: userId },
+    participants: { $all: [userId] },
   })
     .populate({
       path: 'participants',

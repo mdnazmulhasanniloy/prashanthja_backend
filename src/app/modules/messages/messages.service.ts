@@ -6,10 +6,11 @@ import { IMessages } from './messages.interface';
 import Chat from '../chat/chat.models';
 import { chatService } from '../chat/chat.service';
 import QueryBuilder from '../../class/builder/QueryBuilder';
+import { Types } from 'mongoose';
 
 const createMessages = async (payload: IMessages) => {
   const alreadyExists = await Chat.findOne({
-    participants: { $all: [payload.sender, payload.receiver] },
+    participants: { $all: [payload.sender as any, payload.receiver as any] },
   }).populate(['participants']);
 
   if (!alreadyExists) {
@@ -92,7 +93,9 @@ const updateMessages = async (id: string, payload: Partial<IMessages>) => {
 
 // Get messages by chat ID
 const getMessagesByChatId = async (chatId: string) => {
-  const result = await Message.find({ chat: chatId }).sort({ createdAt: -1 });
+  const result = await Message.find({ chat: new Types.ObjectId(chatId) }).sort({
+    createdAt: -1,
+  });
   return result;
 };
 

@@ -85,7 +85,7 @@ const MessagePageHandlers = async (
           { sender: currentUserId, receiver: userId },
           { sender: userId, receiver: currentUserId },
         ],
-      })
+      } as any)
         .sort({ updatedAt: 1 })
         .skip(skip)
         .limit(limit);
@@ -99,7 +99,7 @@ const MessagePageHandlers = async (
         { sender: currentUserId, receiver: userId },
         { sender: userId, receiver: currentUserId },
       ],
-    });
+    } as any);
     const messages = getPreMessage.reverse();
 
     const response = {

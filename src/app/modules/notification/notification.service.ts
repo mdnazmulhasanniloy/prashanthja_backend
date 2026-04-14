@@ -6,6 +6,7 @@ import QueryBuilder from '../../class/builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import httpStatus from 'http-status';
 import moment from 'moment';
+import { Types } from 'mongoose';
 
 // Insert notifications into the database
 const insertNotificationIntoDb = async (payload: any) => {
@@ -43,7 +44,7 @@ const getAllNotifications = async (query: Record<string, any>) => {
 // Mark notifications as read
 const markAsDone = async (id: string) => {
   const result = await Notification.updateMany(
-    { receiver: id },
+    { receiver: new Types.ObjectId(id) },
     {
       $set: {
         read: true,
