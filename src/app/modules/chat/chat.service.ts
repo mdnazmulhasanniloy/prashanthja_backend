@@ -39,11 +39,11 @@ const createChat = async (payload: IChat) => {
 // Get my chat list
 const getMyChatList = async (userId: string) => {
   const chats = await Chat.find({
-    participants: { $in: [userId] },
+    participants: { $in: [new Types.ObjectId(userId)] },
   }).populate({
     path: 'participants',
     select: 'name email profile role _id phoneNumber',
-    match: { _id: { $ne: userId } },
+    match: { _id: { $ne: new Types.ObjectId(userId) } },
   });
 
   if (!chats) {
@@ -56,14 +56,16 @@ const getMyChatList = async (userId: string) => {
 
     // Find the latest message in the chat
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const message: any = await Message.findOne({ chat: chatId }).sort({
+    const message: any = await Message.findOne({
+      chat: new Types.ObjectId(chatId.toString()),
+    }).sort({
       updatedAt: -1,
     });
 
     const unreadMessageCount = await Message.countDocuments({
-      chat: chatId,
+      chat: new Types.ObjectId(chatId.toString()),
       seen: false,
-      sender: { $ne: userId },
+      sender: { $ne: new Types.ObjectId(userId) },
     });
 
     if (message) {
@@ -93,7 +95,9 @@ const getChatById = async (id: string) => {
 };
 const getChatByUserId = async (currentUser: string, secondUser: string) => {
   const result = await Chat.findOne({
-    participants: { $all: [currentUser, secondUser] },
+    participants: {
+      $all: [new Types.ObjectId(currentUser), new Types.ObjectId(secondUser)],
+    },
   }).populate({
     path: 'participants',
     select: 'name email image role _id phoneNumber ',
@@ -116,7 +120,7 @@ const blockedChat = async (id: string, blockBy: string) => {
   }
 
   const updatedChat = await Chat.findOneAndUpdate(
-    { _id: id },
+    { _id: new Types.ObjectId(id) },
     [
       {
         $set: {
@@ -124,7 +128,11 @@ const blockedChat = async (id: string, blockBy: string) => {
             $cond: [{ $eq: ['$status', 'blocked'] }, 'accepted', 'blocked'],
           },
           blockBy: {
-            $cond: [{ $eq: ['$status', 'blocked'] }, null, blockBy],
+            $cond: [
+              { $eq: ['$status', 'blocked'] },
+              null,
+              new Types.ObjectId(blockBy),
+            ],
           },
         },
       },
@@ -158,10 +166,12 @@ const deleteChatList = async (id: string) => {
     session.startTransaction();
 
     // 1. delete messages
-    await Message.deleteMany({ chat: id as any }, { session });
+    await Message.deleteMany({ chat: new Types.ObjectId(id) }, { session });
 
     // 2. delete chat
-    const result = await Chat.findByIdAndDelete(id, { session });
+    const result = await Chat.findByIdAndDelete(new Types.ObjectId(id), {
+      session,
+    });
 
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Chat not found');

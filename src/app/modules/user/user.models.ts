@@ -1,8 +1,9 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model, Types, HydratedDocument } from 'mongoose';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 import { IUser, UserModel } from './user.interface';
 import { Login_With, Role, USER_ROLE } from './user.constants';
+import { CallbackWithoutResultAndOptionalError } from 'mongoose';
 
 const LocationSchema = new Schema({
   type: { type: String, required: true, default: 'Point' },
@@ -173,10 +174,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.post('save', function (doc: Document & IUser, next) {
-  doc.password = '';
-  next();
-});
+userSchema.post(
+  'save',
+  function (
+    doc: HydratedDocument<IUser>,
+    next: CallbackWithoutResultAndOptionalError,
+  ) {
+    doc.password = '';
+    next();
+  },
+);
 
 // set '' after saving password
 // userSchema.post(

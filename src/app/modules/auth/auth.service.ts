@@ -22,6 +22,7 @@ import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import { Login_With, USER_ROLE } from '../user/user.constants';
 import { Request } from 'express';
 import firebaseAdmin from '../../utils/firebase';
+import { Types } from 'mongoose';
 
 // Login
 const login = async (payload: TLogin, req: Request) => {
@@ -42,8 +43,8 @@ const login = async (payload: TLogin, req: Request) => {
     throw new AppError(httpStatus.FORBIDDEN, 'User account is not verified');
   }
   const jwtPayload: { userId: string; role: string } = {
-    userId: user?._id?.toString() as string,
-    role: user?.role,
+    userId: (user?._id as Types.ObjectId)?.toString() as string,
+    role: user?.role as any,
   };
 
   const accessToken = createToken(
@@ -76,7 +77,7 @@ const login = async (payload: TLogin, req: Request) => {
       lastLogin: new Date().toISOString(),
     },
   };
-
+  // @ts-ignore
   await User.findByIdAndUpdate(user?._id, data, {
     new: true,
     upsert: false,
@@ -195,7 +196,7 @@ const resetPassword = async (token: string, payload: TResetPassword) => {
 
   const user: IUser | null = await User.findById(decode?.userId).select(
     'isDeleted verification',
-  ); 
+  );
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -356,7 +357,9 @@ const googleLogin = async (payload: any, req: Request) => {
       phoneNumber: decodedToken?.phone_number,
       role: payload?.role ?? USER_ROLE.user,
       loginWth: Login_With.google,
-      'verification.status': true,
+      verification: {
+        status: true,
+      },
     });
 
     if (!user)

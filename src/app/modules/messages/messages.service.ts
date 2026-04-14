@@ -10,11 +10,13 @@ import { Types } from 'mongoose';
 
 const createMessages = async (payload: IMessages) => {
   const alreadyExists = await Chat.findOne({
-    participants: { $all: [payload.sender as any, payload.receiver as any] },
+    //@ts-ignore
+    participants: { $all: [payload.sender, payload.receiver] },
   }).populate(['participants']);
 
   if (!alreadyExists) {
     const chatList = await Chat.create({
+      //@ts-ignore
       participants: [payload.sender, payload.receiver],
     });
     //@ts-ignore
@@ -93,7 +95,8 @@ const updateMessages = async (id: string, payload: Partial<IMessages>) => {
 
 // Get messages by chat ID
 const getMessagesByChatId = async (chatId: string) => {
-  const result = await Message.find({ chat: new Types.ObjectId(chatId) }).sort({
+  //@ts-ignore
+  const result = await Message.find({ chat: chatId }).sort({
     createdAt: -1,
   });
   return result;

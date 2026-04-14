@@ -66,11 +66,11 @@ const deleteChat = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const blockedChat = catchAsync(async (req: Request, res: Response) => {
-  const result = await chatService.blockedChat(req.params.id, req.user.userId)
+  const result = await chatService.blockedChat(req.params.id, req.user.userId);
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: `Chat ${result?.status} successfully`,
+    message: `Chat status change successfully`,
     data: result,
   });
 });
