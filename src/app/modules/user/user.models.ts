@@ -174,26 +174,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// set '' after saving password
 userSchema.post(
   'save',
-  function (
-    doc: HydratedDocument<IUser>,
-    next: CallbackWithoutResultAndOptionalError,
-  ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function (error: Error, doc: any, next: (error?: Error) => void): void {
     doc.password = '';
+    //@ts-ignore
     next();
   },
 );
-
-// set '' after saving password
-// userSchema.post(
-//   'save',
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   function (error: Error, doc: any, next: (error?: Error) => void): void {
-//     doc.password = '';
-//     next();
-//   },
-// );
 
 userSchema.statics.isUserExist = async function (email: string) {
   return await User.findOne({ email: email }).select('+password');

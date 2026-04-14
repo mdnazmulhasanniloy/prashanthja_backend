@@ -57,13 +57,15 @@ const getMyChatList = async (userId: string) => {
     // Find the latest message in the chat
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const message: any = await Message.findOne({
-      chat: new Types.ObjectId(chatId.toString()),
+      //@ts-ignore
+      chat: chatId.toString,
     }).sort({
       updatedAt: -1,
     });
 
     const unreadMessageCount = await Message.countDocuments({
-      chat: new Types.ObjectId(chatId.toString()),
+      //@ts-ignore
+      chat: chatId,
       seen: false,
       sender: { $ne: new Types.ObjectId(userId) },
     });
@@ -166,7 +168,8 @@ const deleteChatList = async (id: string) => {
     session.startTransaction();
 
     // 1. delete messages
-    await Message.deleteMany({ chat: new Types.ObjectId(id) }, { session });
+    //@ts-ignore
+    await Message.deleteMany({ chat: id }, { session });
 
     // 2. delete chat
     const result = await Chat.findByIdAndDelete(new Types.ObjectId(id), {

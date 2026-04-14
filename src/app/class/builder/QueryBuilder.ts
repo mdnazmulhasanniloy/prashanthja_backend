@@ -1,6 +1,4 @@
-import mongoose, { Query } from 'mongoose';
-// import type { FilterQuery } from 'mongoose';
-type FilterQuery<T> = mongoose.FilterQuery<T>;
+import { Query } from 'mongoose';
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
   public query: Record<string, unknown>;
@@ -78,7 +76,7 @@ class QueryBuilder<T> {
 
     excludeFields.forEach(el => delete queryObj[el]);
 
-    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+    this.modelQuery = this.modelQuery.find(queryObj as any);
 
     return this;
   }

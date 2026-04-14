@@ -1,12 +1,9 @@
 import callbackFn from '../../utils/callbackFn';
-import Message from '../../modules/messages/messages.models';
-import mongoose, { Types } from 'mongoose';
+import Message from '../../modules/messages/messages.models'; 
 import Chat from '../../modules/chat/chat.models';
 import { IChat } from '../../modules/chat/chat.interface';
 import getChatList from './chatList.handlers';
-import { invalidateUserCache } from './invalidCash';
-import { filter } from 'lodash';
-import { IMessages } from '../../modules/messages/messages.interface';
+import { invalidateUserCache } from './invalidCash'; 
 
 const SeenMessageHandlers = async (
   io: any,
@@ -30,12 +27,16 @@ const SeenMessageHandlers = async (
         message: 'chat not found',
       });
     }
-    const filter: mongoose.FilterQuery<IMessages> = {
-      chat: new Types.ObjectId(chatId),
-      receiver: new Types.ObjectId(user?.userId),
-      seen: false,
-    };
-    await Message.updateMany(filter, { $set: { seen: true } });
+    await Message.updateMany(
+      {
+        //@ts-ignore
+        chat: chatId,
+        //@ts-ignore
+        receiver: user?.userId,
+        seen: false,
+      },
+      { $set: { seen: true } },
+    );
 
     const user1 = chat?.participants[0];
     const user2 = chat?.participants[1];
