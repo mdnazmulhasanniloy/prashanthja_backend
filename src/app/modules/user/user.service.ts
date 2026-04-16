@@ -74,7 +74,7 @@ const getAccommodation = async (query: Record<string, any>) => {
   pipeline.push({
     $match: {
       isDeleted: false,
-      role: { $ne: USER_ROLE.admin },
+      // role: { $ne: USER_ROLE.admin },
       accommodationAvailable: true,
     },
   });
