@@ -47,6 +47,7 @@ const getMyChatList = async (userId: string) => {
   });
 
   if (!chats) {
+    return [];
     throw new AppError(httpStatus.BAD_REQUEST, 'Chat list not found');
   }
 
