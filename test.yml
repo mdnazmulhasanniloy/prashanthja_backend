@@ -1,0 +1,10 @@
+config:
+  target: 'https://api.friendzy.club/api/v1/users/accommodation'
+  phases:
+    - duration: 60
+      arrivalRate: 200
+
+scenarios:
+  - flow:
+      - get:
+          url: '/'

@@ -13,7 +13,8 @@ services:
       - '2005:2005'
     depends_on:
       - redis
-    command: ['node', 'dist/server.js']
+    # command: ['node', 'dist/server.js']
+    command: ['pm2-runtime', 'dist/server.js', '-i', 'max']
 
   redis:
     image: redis:7.2-alpine
@@ -24,6 +25,13 @@ services:
       - redis-data:/data
     restart: always
     command: ['redis-server', '--appendonly', 'yes']
+
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - app
 
 volumes:
   redis-data:

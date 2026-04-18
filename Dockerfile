@@ -16,13 +16,13 @@ RUN npm run build
 
 # ---------- STAGE 2: PRODUCTION ---------- 
 FROM node:22-alpine
-
 WORKDIR /app
 
-COPY package*.json ./
+# install pm2 only once (correct place)
+RUN npm install -g pm2
 
-# IMPORTANT: install ALL deps (not only production)
-RUN npm ci
+COPY package*.json ./
+RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/firebase.json ./firebase.json
@@ -30,4 +30,4 @@ COPY --from=builder /app/firebase.json ./firebase.json
 EXPOSE 2000
 EXPOSE 2005
 
-CMD ["node", "dist/server.js"]
+CMD ["pm2-runtime", "dist/server.js", "-i", "max"]
