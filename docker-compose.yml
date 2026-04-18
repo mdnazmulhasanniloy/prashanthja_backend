@@ -12,9 +12,7 @@ services:
       - '2000:2000'
       - '2005:2005'
     depends_on:
-      - redis
-    # command: ['node', 'dist/server.js']
-    # command: []
+      - redis 
 
   redis:
     image: redis:7.2-alpine
