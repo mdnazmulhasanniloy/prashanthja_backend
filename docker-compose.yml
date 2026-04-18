@@ -14,13 +14,13 @@ services:
     depends_on:
       - redis
     # command: ['node', 'dist/server.js']
-    command: null
+    # command: []
 
   redis:
     image: redis:7.2-alpine
     container_name: prashanthja_redis
     expose:
-       - 6379
+      - 6379
     volumes:
       - redis-data:/data
     restart: always
