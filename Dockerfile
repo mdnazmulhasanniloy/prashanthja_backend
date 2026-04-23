@@ -4,6 +4,7 @@ WORKDIR /app
 
 # copy package.json + package-lock.json
 COPY ./package*.json ./
+COPY ./public ./public
 
 # install dev dependencies
 RUN npm ci
@@ -22,6 +23,7 @@ WORKDIR /app
 RUN npm install -g pm2
 
 COPY package*.json ./
+COPY ./public ./public
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist

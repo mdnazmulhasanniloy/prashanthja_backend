@@ -8,3 +8,4 @@ scenarios:
   - flow:
       - get:
           url: '/'
+# npx artillery run test.yml
