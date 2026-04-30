@@ -42,7 +42,7 @@ const getAllEvents = async (query: Record<string, any>) => {
           coordinates: [parseFloat(longitude), parseFloat(latitude)],
         },
         key: 'location',
-        maxDistance: parseFloat(5 as unknown as string) * 1609, // 5 miles to meters
+        maxDistance: parseFloat(13 as unknown as string) * 1609, // 5 miles to meters
         distanceField: 'dist.calculated',
         spherical: true,
       },
