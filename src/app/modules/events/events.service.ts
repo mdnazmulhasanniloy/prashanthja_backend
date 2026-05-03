@@ -77,7 +77,7 @@ const getAllEvents = async (query: Record<string, any>) => {
   if (searchTerm) {
     pipeline.push({
       $match: {
-        $or: ['title'].map(field => ({
+        $or: ['title', 'address'].map(field => ({
           [field]: {
             $regex: searchTerm,
             $options: 'i',
