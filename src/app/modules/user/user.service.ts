@@ -50,6 +50,7 @@ const createUser = async (payload: IUser): Promise<IUser> => {
   return user;
 };
 
+
 const getAccommodation = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
   const { searchTerm, latitude, longitude, ...filtersData } = filters;
@@ -76,6 +77,7 @@ const getAccommodation = async (query: Record<string, any>) => {
       isDeleted: false,
       // role: { $ne: USER_ROLE.admin },
       accommodationAvailable: true,
+      'verification.status': true,
     },
   });
 
@@ -178,6 +180,7 @@ const getAllUser = async (query: Record<string, any>) => {
   pipeline.push({
     $match: {
       isDeleted: false,
+      'verification.status': true,
     },
   });
 
