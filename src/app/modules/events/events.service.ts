@@ -48,7 +48,13 @@ const getAllEvents = async (query: Record<string, any>) => {
       },
     });
   }
-
+  pipeline.push({
+    $match: {
+      date: {
+        $gte: moment().toDate(),
+      },
+    },
+  });
   if (date) {
     const startOfDay = moment(date).startOf('day').toDate();
     const endOfDay = moment(date).endOf('day').toDate();
