@@ -16,7 +16,7 @@ const createEvents = async (payload: IEvents) => {
 };
 
 const getAllEvents = async (query: Record<string, any>) => {
-  const { filters, pagination } = await pickQuery(query);
+  const { filters, pagination, ifFutureData } = await pickQuery(query);
   const {
     searchTerm,
     latitude,
@@ -48,13 +48,15 @@ const getAllEvents = async (query: Record<string, any>) => {
       },
     });
   }
-  pipeline.push({
-    $match: {
-      date: {
-        $gte: moment().toDate(),
+  if (ifFutureData && ifFutureData === 'true') {
+    pipeline.push({
+      $match: {
+        date: {
+          $gte: moment().toDate(),
+        },
       },
-    },
-  });
+    });
+  }
   if (date) {
     const startOfDay = moment(date).startOf('day').toDate();
     const endOfDay = moment(date).endOf('day').toDate();
