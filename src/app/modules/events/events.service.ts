@@ -16,7 +16,7 @@ const createEvents = async (payload: IEvents) => {
 };
 
 const getAllEvents = async (query: Record<string, any>) => {
-  const { filters, pagination, ifFutureData } = await pickQuery(query);
+  const { filters, pagination } = await pickQuery(query);
   const {
     searchTerm,
     latitude,
@@ -24,6 +24,7 @@ const getAllEvents = async (query: Record<string, any>) => {
     author,
     date,
     afterDate,
+    isFutureData,
     ...filtersData
   } = filters;
   if (author) {
@@ -48,7 +49,7 @@ const getAllEvents = async (query: Record<string, any>) => {
       },
     });
   }
-  if (ifFutureData && ifFutureData === 'true') {
+  if (isFutureData && isFutureData === 'true') {
     pipeline.push({
       $match: {
         date: {
