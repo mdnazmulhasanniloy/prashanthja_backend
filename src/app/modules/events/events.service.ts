@@ -16,7 +16,6 @@ const createEvents = async (payload: IEvents) => {
 };
 
 const getAllEvents = async (query: Record<string, any>) => {
-  console.log('----------------->>>', query);
   const { filters, pagination } = await pickQuery(query);
   const {
     searchTerm,
